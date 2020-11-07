@@ -10,6 +10,7 @@ services:
       - MONGO_HOSTNAME=db
       - MONGO_PORT=$MONGO_PORT
       - MONGO_DB=$MONGO_DB
+      - DOMAIN=$DOMAIN
     ports:
       - "80:3000"
     volumes:

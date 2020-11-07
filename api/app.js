@@ -1,15 +1,19 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-// const formidable = require('express-formidable')
+const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const routes = require('./routes')
 require('./db')
 
 app.use(cors())
 
+app.use('/uploads', express.static('uploads'))
+
 // file uploads
-// app.use(formidable())
+app.use(fileUpload({
+  createParentPath: true,
+}))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

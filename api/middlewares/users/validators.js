@@ -21,20 +21,19 @@ const validate = (req, res, next) => {
 module.exports = {
   create: [
     check('email').exists().notEmpty().isEmail(),
-    // check('password').isLength({ min: 5 }),
-    check('name').optional(),
-    check('username').optional(),
+    check('name').optional().isString(),
+    check('username').optional().isString(),
     check('phone').optional(),
-    check('website').optional(),
+    check('website').optional().isString(),
     check('avatar').optional(),
     validate,
   ],
   update: [
     check('name').optional().notEmpty().isString(),
     check('username').optional().notEmpty().isString(),
-    check('phone').optional().notEmpty().isString(),
-    check('website').optional().notEmpty().isString(),
-    check('avatar').optional().notEmpty().isString(),
+    check('phone').optional().notEmpty(),
+    check('website').optional().isString(),
+    check('avatar').optional(),
     validate,
   ],
 }

@@ -61,18 +61,19 @@ userSchema.statics.findByCredentials = async (email, password) => {
     throw new Error({ error: 'Invalid login credentials' })
   }
   const isPasswordMatch = await bcrypt.compare(password, user.password)
-  console.log('here', email, password, isPasswordMatch)
 
   if (!isPasswordMatch) {
-    console.log('euh')
     throw new Error({ error: 'Invalid login credentials' })
   }
-  console.log('allo')
   return user
 }
 
 const User = module.exports = mongoose.model('User', userSchema)
 
 module.exports.get = (callback, limit) => {
-  User.find(callback).limit(limit)
+  User.find(callback).limit(limit).lean()
+}
+
+module.exports.getById = (id, callback) => {
+  User.findById(id, callback).lean()
 }

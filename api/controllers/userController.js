@@ -1,5 +1,5 @@
 const User = require('./../models/userModel')
-// const fs = require('fs')
+const { v4: uuidv4 } = require('uuid')
 
 // fetch all users
 exports.index = (req, res) => {
@@ -21,11 +21,17 @@ exports.index = (req, res) => {
 
 // create user
 exports.new = (req, res) => {
-  const user = new User(req.body)
+  const { avatar = '' } = req.files || {}
+  const name = avatar !== '' ? `${uuidv4()}.${avatar.name.split('.').pop()}` : ''
+  const avatarName = avatar !== '' ? `${process.env.DOMAIN}/${name}` : ''
+  const user = new User({ ...req.body, avatar: avatarName })
   return user.save(async (err) => {
     if (err) {
       return res.status(500).send(err)
     } else {
+      if (avatar !== '') {
+        avatar.mv(`./uploads/${name}`)
+      }
       return res.json({
         status: 201,
         message: 'user created successfully',
@@ -37,7 +43,7 @@ exports.new = (req, res) => {
 
 // get user by id
 exports.view = (req, res) => {
-  User.findById(req.params.id, (err, user) => {
+  User.getById(req.params.id, (err, user) => {
     if (err) {
       res.send(err)
     } else {
@@ -52,11 +58,17 @@ exports.view = (req, res) => {
 
 // update user
 exports.update = (req, res) => {
-  console.log('HERE I AM')
+  const { avatar = '' } = req.files || {}
   User.findById(req.params.id, (err, user) => {
     if (err) {
       res.send(err)
     } else {
+      if (typeof avatar !== 'string' && avatar !== '') {
+        const name = avatar !== '' ? `${uuidv4()}.${avatar.name.split('.').pop()}` : ''
+        const avatarName = avatar !== '' ? `${process.env.DOMAIN}/${name}` : ''
+        avatar.mv(`./uploads/${name}`)
+        user.avatar = avatarName
+      }
       Object.entries(req.body).forEach(([key, value]) => user[key] = value)
 
       user.save((err) => {
