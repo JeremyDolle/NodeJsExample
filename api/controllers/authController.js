@@ -14,3 +14,17 @@ exports.login = async (req, res) => {
     res.status(400).send(error)
   }
 }
+
+exports.me = async (req, res) => {
+  try {
+    const token = req.header('Authorization').replace('Bearer ', '')
+    const user = await User.findOne({ token })
+    res.json({
+      status: 200,
+      message: 'user retrieved successfully',
+      data: user,
+    })
+  } catch (error) {
+    res.status(400).send(error)
+  }
+}

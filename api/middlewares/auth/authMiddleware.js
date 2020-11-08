@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const User = require('../../models/userModel')
 
 module.exports.authMiddleware = async (req, res, next) => {
-  console.log(req.header('Authorization'))
   try {
     const token = req.header('Authorization').replace('Bearer ', '')
     const data = jwt.verify(token, process.env.JWT_KEY)
