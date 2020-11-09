@@ -23,7 +23,7 @@ exports.index = (req, res) => {
 exports.new = (req, res) => {
   const { avatar = '' } = req.files || {}
   const name = avatar !== '' ? `${uuidv4()}.${avatar.name.split('.').pop()}` : ''
-  const avatarName = avatar !== '' ? `${process.env.DOMAIN}/${name}` : ''
+  const avatarName = avatar !== '' ? `${process.env.DOMAIN}/uploads/${name}` : ''
   const user = new User({ ...req.body, avatar: avatarName })
   return user.save(async (err) => {
     if (err) {
@@ -65,7 +65,7 @@ exports.update = (req, res) => {
     } else {
       if (typeof avatar !== 'string' && avatar !== '') {
         const name = avatar !== '' ? `${uuidv4()}.${avatar.name.split('.').pop()}` : ''
-        const avatarName = avatar !== '' ? `${process.env.DOMAIN}/${name}` : ''
+        const avatarName = avatar !== '' ? `${process.env.DOMAIN}/uploads/${name}` : ''
         avatar.mv(`./uploads/${name}`)
         user.avatar = avatarName
       }
