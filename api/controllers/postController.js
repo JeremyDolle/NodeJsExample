@@ -2,9 +2,7 @@ const Post = require('./../models/postModel')
 
 // fetch all users
 exports.index = (req, res) => {
-  console.log('post get all')
   Post.get((err, posts) => {
-    console.log(err, posts)
     if (err) {
       res.json({
         status: 'error',
