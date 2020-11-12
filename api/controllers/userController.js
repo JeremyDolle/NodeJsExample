@@ -3,9 +3,8 @@ const { v4: uuidv4 } = require('uuid')
 
 // fetch all users
 exports.index = (req, res) => {
-  const search = req.query.search || ''
-
-  User.get(search, (err, users) => {
+  const { search = '', ...filters } = req.query || {}
+  User.get(search, filters, (err, users) => {
     if (err) {
       res.json({
         status: 'error',

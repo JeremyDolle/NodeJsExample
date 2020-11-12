@@ -76,12 +76,23 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
 const User = module.exports = mongoose.model('User', userSchema)
 
-module.exports.get = (search, callback, limit) => {
-  User.listIndexes().then(toto => console.log(toto))
+module.exports.get = (search, filters, callback, limit) => {
+  const sort = Object.entries(filters).map(([key, value]) => {
+    return [key, value === 'asc' ? 'asc' : 'desc']
+  })
+
   if (search !== '') {
-    User.find({ $text: { $search: search } }, callback).limit(limit).lean()
+    if (sort.length) {
+      User.find({ $text: { $search: search } }, callback).sort(sort).limit(limit).lean()
+    } else {
+      User.find({ $text: { $search: search } }, callback).limit(limit).lean()
+    }
   } else {
-    User.find(callback).limit(limit).lean()
+    if (sort.length) {
+      User.find(callback).sort(sort).limit(limit).lean()
+    } else {
+      User.find(callback).limit(limit).lean()
+    }
   }
 }
 
