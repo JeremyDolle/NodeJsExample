@@ -37,6 +37,12 @@ const userSchema = mongoose.Schema({
   },
 })
 
+userSchema.index({
+  email: 'text',
+  username: 'text',
+  name: 'text',
+})
+
 userSchema.pre('save', async function (next) {
   const user = this
   if (user.isModified('password')) {
@@ -70,8 +76,13 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
 const User = module.exports = mongoose.model('User', userSchema)
 
-module.exports.get = (callback, limit) => {
-  User.find(callback).limit(limit).lean()
+module.exports.get = (search, callback, limit) => {
+  User.listIndexes().then(toto => console.log(toto))
+  if (search !== '') {
+    User.find({ $text: { $search: search } }, callback).limit(limit).lean()
+  } else {
+    User.find(callback).limit(limit).lean()
+  }
 }
 
 module.exports.getById = (id, callback) => {
