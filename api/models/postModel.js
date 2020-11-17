@@ -16,9 +16,44 @@ const postSchema = mongoose.Schema({
   },
 })
 
-// Create model
-const Post = module.exports = mongoose.model('post', postSchema)
+postSchema.index({
+  title: 'text',
+  body: 'text',
+})
 
-module.exports.get = (callback, limit = 1) => {
-  return Post.find(callback).limit(limit)
+// Create model
+const Post = module.exports = mongoose.model('Post', postSchema)
+
+module.exports.get = (search, limit, page, filters, callback = 10) => {
+  const sort = Object.entries(filters).map(([key, value]) => {
+    return [key, value === 'asc' ? 'asc' : 'desc']
+  })
+
+  if (search !== '') {
+    if (sort.length) {
+      Post.find({ $text: { $search: search } }, callback)
+        .sort(sort)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    } else {
+      Post.find({ $text: { $search: search } }, callback)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    }
+  } else {
+    if (sort.length) {
+      Post.find(callback)
+        .sort(sort)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    } else {
+      Post.find(callback)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    }
+  }
 }

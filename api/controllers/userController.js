@@ -2,9 +2,12 @@ const User = require('./../models/userModel')
 const { v4: uuidv4 } = require('uuid')
 
 // fetch all users
-exports.index = (req, res) => {
-  const { search = '', ...filters } = req.query || {}
-  User.get(search, filters, (err, users) => {
+exports.index = async (req, res) => {
+  const { search = '', page = 1, limit = 10, ...filters } = req.query || {}
+
+  const count = await User.countDocuments()
+
+  User.get(search, limit, page, filters, (err, users) => {
     if (err) {
       res.json({
         status: 'error',
@@ -15,6 +18,8 @@ exports.index = (req, res) => {
         status: 200,
         message: 'users retrieved successfully',
         data: users,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
       })
     }
   })

@@ -1,8 +1,12 @@
 const Post = require('./../models/postModel')
 
 // fetch all users
-exports.index = (req, res) => {
-  Post.get((err, posts) => {
+exports.index = async (req, res) => {
+  const { search = '', page = 1, limit = 10, ...filters } = req.query || {}
+
+  const count = await Post.countDocuments()
+
+  Post.get(search, limit, page, filters, (err, posts) => {
     if (err) {
       res.json({
         status: 'error',
@@ -13,6 +17,8 @@ exports.index = (req, res) => {
         status: 200,
         message: 'posts retrieved successfully',
         data: posts,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
       })
     }
   })
@@ -20,7 +26,7 @@ exports.index = (req, res) => {
 
 // create user
 exports.new = (req, res) => {
-  let post = new Post()
+  const post = new Post()
   post.title = req.body.title
   post.body = req.body.body
   post.save((err) => {

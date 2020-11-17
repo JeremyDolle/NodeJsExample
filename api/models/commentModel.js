@@ -20,9 +20,45 @@ const commentSchema = mongoose.Schema({
   },
 })
 
-// Create model
-const Comment = module.exports = mongoose.model('comment', commentSchema)
+commentSchema.index({
+  name: 'text',
+  body: 'text',
+})
 
-module.exports.get = (callback, limit) => {
-  Comment.find(callback).limit(limit)
+// Create model
+const Comment = module.exports = mongoose.model('Comment', commentSchema)
+
+module.exports.get = (search, limit, page, filters, callback) => {
+  const sort = Object.entries(filters).map(([key, value]) => {
+    return [key, value === 'asc' ? 'asc' : 'desc']
+  })
+
+  if (search !== '') {
+    console.log(sort)
+    if (sort.length) {
+      Comment.find({ $text: { $search: search } }, callback)
+        .sort(sort)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    } else {
+      Comment.find({ $text: { $search: search } }, callback)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    }
+  } else {
+    if (sort.length) {
+      Comment.find(callback)
+        .sort(sort)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    } else {
+      Comment.find(callback)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean()
+    }
+  }
 }

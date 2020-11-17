@@ -1,8 +1,12 @@
 const Comment = require('../models/commentModel')
 
 // fetch all users
-exports.index = (req, res) => {
-  Comment.get((err, comments) => {
+exports.index = async (req, res) => {
+  const { search = '', page = 1, limit = 10, ...filters } = req.query || {}
+
+  const count = await Comment.countDocuments()
+
+  Comment.get(search, limit, page, filters, (err, comments) => {
     if (err) {
       res.json({
         status: 'error',
@@ -13,6 +17,8 @@ exports.index = (req, res) => {
         status: 200,
         message: 'comments retrieved successfully',
         data: comments,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
       })
     }
   })
